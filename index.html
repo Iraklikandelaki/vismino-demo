@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Vismino</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="./main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			
+		</div>
+
+		<script src="./build/three.js"></script>
+		<script src="./controls/OrbitControls.js"></script>
+		<script src="./loaders/GLTFLoader.js"></script>
+		<script>
+
+			// import * as THREE from './build/three.module.js';
+
+			// import { OrbitControls } from './controls/OrbitControls.js';
+			// import { GLTFLoader } from './loaders/GLTFLoader.js';
+	
+
+			let camera, scene, renderer, bottle2, controls;
+			
+			const mouse = new THREE.Vector2();
+			const target = new THREE.Vector2();
+			const windowHalf = new THREE.Vector2( window.innerWidth / 2, window.innerHeight / 2 );
+
+			init();
+			render();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0, 0.6, -60 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0xffffff)
+
+			
+			
+
+				const pointlight = new THREE.PointLight( 0xffffff, 0.5, 500 );
+				pointlight.position.set( 0, 0.6, -70 );
+				scene.add( pointlight );
+
+				const pointlight2 = new THREE.PointLight( 0xf7f7f7, 0.5, 200 );
+				pointlight2.position.set( 0, 10, -70 );
+				scene.add( pointlight2 );
+
+
+				const light = new THREE.AmbientLight( 0x404040, 1 ); // soft white light
+				scene.add( light );
+
+						const loader = new THREE.GLTFLoader().setPath( './bottle2new/' );
+						loader.load( 'scene.gltf', function ( gltf ) {
+							bottle2 = gltf.scene;
+							bottle2.rotation.y = 2.8;
+							bottle2.traverse( function ( child ) {
+
+								if ( child.isMesh ) {
+
+						
+
+								}
+
+							} );
+							bottle2.scale.set(0.1, 0.1, 0.1)
+							scene.add( bottle2 );
+
+				
+
+							render();
+
+						} );
+
+				
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x000000, 0 );
+		
+				container.appendChild( renderer.domElement );
+
+			
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 2;
+				controls.maxDistance = 900;
+				// controls.target.set( 0, 0, -270 );
+				// camera.updateProjectionMatrix
+				// camera.lookAt(bottle2.position)
+				controls.minPolarAngle = (Math.PI / 2) - 0.1; // radians
+		  		controls.maxPolarAngle = (Math.PI / 2) - 0.1; // radians
+				controls.enablePan = false;
+				controls.enableZoom = false;
+				controls.update();
+
+				document.addEventListener( 'mousemove', onMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+			function onMouseMove( event ) {
+
+			mouse.x = ( event.clientX - windowHalf.x );
+			mouse.y = ( event.clientY - windowHalf.x );
+
+			}
+
+			//
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			
+			var animate = function () {
+				
+				requestAnimationFrame( animate );
+
+		
+
+				
+	
+			if (bottle2)bottle2.rotation.y += 0.01;
+		
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.05;
+
+				controls.update();
+
+				
+		
+			
+
+			// target.x = ( 1 - mouse.x ) * 0.003;
+			// 	target.y = ( 1 - mouse.y ) * 0.003;
+				
+			// 	camera.rotation.x += 0.002 * ( target.y - camera.rotation.x );
+			// 	camera.rotation.y += 0.002 * ( target.x - camera.rotation.y );
+
+				renderer.render(scene, camera);
+			};
+
+			animate();
+		</script>
+
+	</body>
+</html>
